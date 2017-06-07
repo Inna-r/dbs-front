@@ -45,6 +45,9 @@
             </li>
         </ul>
     </nav>
+    <div class="persons-filter-form-wrapper" ng-if="generalSearchCtrl.collection == 'places'">
+      <leaflet preview-data="generalSearchCtrl.results.hits" id="general_search_map" type="gs_search"></leaflet>
+    </div>
     <div class="persons-filter-form-wrapper">
       <div class="persons-filter-form" ng-show="generalSearchCtrl.collection == 'persons'">
         <div class="left-side">
@@ -179,6 +182,7 @@
         </form>
       </div>
     </div>
+
 
     <div id="general-search-page">
         <ng-switch on="generalSearchCtrl.collection">

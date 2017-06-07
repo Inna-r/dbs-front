@@ -1,43 +1,64 @@
-angular.module('main').directive('leaflet', [
+  angular.module('main').directive('leaflet', [
            'leaflet', 'langManager', '$http', 'apiClient', 'item',
   function (leaflet, langManager, $http, apiClient, item) {
     return {
       template: '<div></div>',
       replace: true,
       scope: {
-        previewData: '='
+        previewData: '=',
+        type: '@'
       },
 
       link: function ($scope, element, attributes) {
 
+        var map = L.map(element[0]);
+          //add tiles to map
+          var pngTiles = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            subdomains: ['a', 'b', 'c']
+          }).addTo(map);
+
         $scope.$watchCollection(function(){return $scope.previewData}, function(newVal, oldVal) {
-          if(Object.keys(newVal).length && newVal.geometry) {
-            get_map(newVal);
+          if ($scope.type ==  'gs_search') {
+            if(newVal.length > 0) {
+              get_general_search_map(newVal);
+            }
+          }
+          else {
+            if(Object.keys(newVal).length && newVal.geometry) {
+              get_map(newVal);
+            }
           }
         });
+
+        //TODO: add popup and links to marker
+        function get_general_search_map(data) {
+          var bounds = [];
+          data.forEach(function(place) {
+          var coordinates = [];
+            if (place._source.geometry) {
+              coordinates.push(place._source.geometry.coordinates[1]);
+              coordinates.push(place._source.geometry.coordinates[0]);
+              bounds.push(coordinates);
+              //add marker to the map
+              marker = new L.marker(coordinates).addTo(map);
+            }
+          });
+
+          map.fitBounds(bounds);
+        };
 
         function get_map(data) {
           var lang = langManager.lang,
               cap_lang = lang[0].toUpperCase() + lang.slice(1),
               active_place_title = data.Header[cap_lang];
-
-
-          //set map center
           var act_lat = data.geometry.coordinates[1],
               act_lng = data.geometry.coordinates[0];
 
-          var map = L.map(element[0])
-              .setView([act_lat, act_lng], 7);
+          //set map's center
+          map.setView([act_lat, act_lng], 7);
 
           setTimeout(function() {map.invalidateSize();}, 1000);
-
-          //add tiles
-          var pngTiles = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 10,
-            minZoom: 7,
-            subdomains: ['a', 'b', 'c']
-          }).addTo(map);
 
           var bounds = {};
           map.on('moveend resize', function () {

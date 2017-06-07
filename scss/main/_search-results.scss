@@ -1,3 +1,15 @@
+#general_search_map {
+    height: 300px;
+    z-index: 0;
+    width: 100%;
+    border: 1px solid #AAA;
+    margin-bottom: 15px;
+    @include box-shadow(0 0 6px 0 #999);
+    .topmost {
+        z-index: 100 !important;
+    }
+}
+
 .persons-filter-form-wrapper {
   box-shadow: 0 7px 3px -5px #b0b0b0;
   width: 100%;
