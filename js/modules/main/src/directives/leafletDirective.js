@@ -44,8 +44,7 @@
               marker = new L.marker(coordinates).addTo(map);
             }
           });
-
-          map.fitBounds(bounds);
+          map.fitBounds(bounds, {maxZoom: 12});
         };
 
         function get_map(data) {
